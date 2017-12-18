@@ -13,6 +13,7 @@ class Weather extends Component {
     this.appid = '6b218fbb4c0741d82f4ce29b3fe6a873';
     this.state = { data: null, error: null };
     this.reqType = 'zip';
+
     this.getWeather = this.getWeather.bind(this);
     this.updateReqType = this.updateReqType.bind(this);
   }
@@ -23,7 +24,7 @@ class Weather extends Component {
 
   updateReqType(e) {
     e.preventDefault();
-    let type = e.currentTarget.value;
+    const type = e.currentTarget.value;
     this.reqType = type;
     $("#data").val("");
     $("#data").attr("placeholder", type);
@@ -31,36 +32,45 @@ class Weather extends Component {
 
   getWeather(e) {
     e.preventDefault();
-    let reqData = $("#data").val();
-    let countryCode = $("#countries").val();
-    let req;
+    const reqData = $("#data").val();
+    const countryCode = $("#countries").val();
+    let rbody;
 
     if (this.reqType === "zip") {
       if (!$.isNumeric(reqData)) {
         this.setState({ error: { message : "zip code should be numeric"} });
         return;
       }
-      req = 'zip='  + reqData + "," + countryCode + "&APPID=" + this.appid;
+      rbody = 'zip='  + reqData + "," + countryCode;
     } else if (this.reqType === "city-name") {
       if (!this.validLetterSeq(reqData)) {
         this.setState({ error: { message : "city name should contain only letters"} });
         return;
       }
-      req = 'q=' + reqData + "," + countryCode + "&APPID=" + this.appid;
+      rbody = 'q=' + reqData + "," + countryCode;
     }
-    fetch(this.base + req, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-    }).then(response => { //refactor-le
+
+    fetch('http://ip-api.com/json').then((response) => {
       if (response.ok) {
         response.json().then(json => {
-          this.setState({ data: json, error: null});
-        });
-      } else {
-        response.json().then(json => {
-          this.setState({ data: null, error: json});
+          const temp = (json.countryCode === 'US') ? 'imperial' : 'metric';
+          const req = this.base + rbody + "&APPID=" + this.appid + "&units=" + temp;
+          fetch(req, {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+            },
+          }).then(response => { //refactor-le
+            if (response.ok) {
+              response.json().then(json => {
+                this.setState({ data: json, error: null});
+              });
+            } else {
+              response.json().then(json => {
+                this.setState({ data: null, error: json});
+              });
+            }
+          });
         });
       }
     });
