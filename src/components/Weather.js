@@ -52,8 +52,8 @@ class Weather extends Component {
 
     fetch('http://ip-api.com/json').then((response) => {
       if (response.ok) {
-        response.json().then(json => {
-          const temp = (json.countryCode === 'US') ? 'imperial' : 'metric';
+        response.json().then(loc => {
+          const temp = (loc.countryCode === 'US') ? 'imperial' : 'metric';
           const req = this.base + rbody + "&APPID=" + this.appid + "&units=" + temp;
           fetch(req, {
             method: 'GET',
