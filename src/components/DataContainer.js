@@ -6,7 +6,7 @@ function WeatherDataHolder(props) {
       <div className="container">
         <p className="text">City name: {props.data.name} </p>
         <p className="text">Weather: {props.data.weather[0].main} </p>
-        <p className="text">Weather: {props.data.weather[0].description}  </p>
+        <p className="text">Description: {props.data.weather[0].description}  </p>
         <p className="text">Temperature: {props.data.main.temp} F</p>
         <p className="text">Pressure: {props.data.main.pressure} </p>
         <p className="text">Humidity: {props.data.main.humidity} </p>

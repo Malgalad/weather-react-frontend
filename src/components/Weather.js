@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import DataContainer from './components/DataContainer'
-import WeatherError from './components/WeatherError'
-import CountryList from './components/CountryList'
-import './style.css'
+import DataContainer from './DataContainer'
+import WeatherError from './WeatherError'
+import CountryList from './CountryList'
+import '../style.css'
 import $ from 'jquery'
 
-class App extends Component {
+class Weather extends Component {
 
   constructor(props) {
     super(props);
@@ -33,7 +33,7 @@ class App extends Component {
     e.preventDefault();
     let reqData = $("#data").val();
     let countryCode = $("#countries").val();
-    var req;
+    let req;
 
     if (this.reqType === "zip") {
       if (!$.isNumeric(reqData)) {
@@ -53,7 +53,7 @@ class App extends Component {
       headers: {
         Accept: 'application/json',
       },
-    }).then(response => {
+    }).then(response => { //refactor-le
       if (response.ok) {
         response.json().then(json => {
           this.setState({ data: json, error: null});
@@ -75,9 +75,7 @@ class App extends Component {
           <button className="country-type" value="city-name" onClick={this.updateReqType}>City-name</button>
             <input id="data" placeholder="zip"/>
             <CountryList />
-            {this.state.error != null &&
-              <WeatherError error={this.state.error}/>
-            }
+            {this.state.error && <WeatherError error={this.state.error}/>}
             <button className="btn" onClick={this.getWeather}>get weather</button>
           </form>
         </div>
@@ -87,4 +85,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default Weather;
