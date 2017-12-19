@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import '../style.css'
 
 function OptionCountryItem(props) {
-    return <option value={props.country.alpha2Code}>{props.country.name}</option>
+    return <option key={props.country.alpha2Code} value={props.country.alpha2Code}>{props.country.name}</option>
 }
 
 class CountryList extends Component {
@@ -10,9 +10,14 @@ class CountryList extends Component {
   constructor(props) {
     super(props);
     this.reqUrl = 'https://restcountries.eu/rest/v2/all?fields=name;alpha2Code';
-    this.state = { optCountrySet :[<OptionCountryItem country={ {name:"France", alpha2Code:"fr"}}/>]}
+    this.state = { optCountrySet : null}
 
     this.componentDidMount = this.componentDidMount.bind(this);
+    this.handleSelectChange = this.handleSelectChange.bind(this);
+  }
+
+  handleSelectChange(e) {
+    this.props.onCountryChange(e.target.value)
   }
 
   componentDidMount() {
@@ -25,7 +30,10 @@ class CountryList extends Component {
       if (response.ok) {
         response.json().then(json => {
           this.setState({
-            optCountrySet: json.map((country) => <OptionCountryItem key={country.alpha2Code} country={country}/>)
+            optCountrySet: json.map((country) => (
+              <OptionCountryItem
+               country={country}/>)
+             )
           });
         });
       }
@@ -34,7 +42,7 @@ class CountryList extends Component {
 
   render() {
     return (
-      <select id="countries">
+      <select onChange={this.handleSelectChange} id="countries">
         {this.state.optCountrySet}
       </select>
     );

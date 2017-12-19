@@ -11,11 +11,18 @@ class Weather extends Component {
     super(props);
     this.base = 'http://api.openweathermap.org/data/2.5/weather?';
     this.appid = '6b218fbb4c0741d82f4ce29b3fe6a873';
-    this.state = { data: null, error: null };
-    this.reqType = 'zip';
+    this.state = {
+      weatherData: null,
+      error: null,
+      reqType: 'zip',
+      curCountryCode: '',
+      reqData: ''
+    };
 
     this.getWeather = this.getWeather.bind(this);
     this.updateReqType = this.updateReqType.bind(this);
+    this.updateData = this.updateData.bind(this);
+    this.updateCountry = this.updateCountry.bind(this);
   }
 
   validLetterSeq(seq) {
@@ -24,30 +31,33 @@ class Weather extends Component {
 
   updateReqType(e) {
     e.preventDefault();
-    const type = e.currentTarget.value;
-    this.reqType = type;
-    $("#data").val("");
-    $("#data").attr("placeholder", type);
+    this.setState( { reqType: e.target.value, reqData: '' } );
+  }
+
+  updateData(e) {
+    this.setState( { reqData: e.target.value } )
+  }
+
+  updateCountry(countryAlpha2Code) {
+    this.setState( {curCountryCode: countryAlpha2Code} )
   }
 
   getWeather(e) {
     e.preventDefault();
-    const reqData = $("#data").val();
-    const countryCode = $("#countries").val();
     let rbody;
 
-    if (this.reqType === "zip") {
-      if (!$.isNumeric(reqData)) {
+    if (this.state.reqType === "zip") {
+      if (!$.isNumeric(this.state.reqData)) {
         this.setState({ error: { message : "zip code should be numeric"} });
         return;
       }
-      rbody = 'zip='  + reqData + "," + countryCode;
-    } else if (this.reqType === "city-name") {
-      if (!this.validLetterSeq(reqData)) {
+      rbody = 'zip='  + this.state.reqData + "," + this.state.curCountryCode;
+    } else if (this.state.reqType === "city-name") {
+      if (!this.validLetterSeq(this.state.reqData)) {
         this.setState({ error: { message : "city name should contain only letters"} });
         return;
       }
-      rbody = 'q=' + reqData + "," + countryCode;
+      rbody = 'q=' + this.state.reqData + "," + this.state.curCountryCode;
     }
 
     fetch('http://ip-api.com/json').then((response) => {
@@ -63,11 +73,11 @@ class Weather extends Component {
           }).then(response => { //refactor-le
             if (response.ok) {
               response.json().then(json => {
-                this.setState({ data: json, error: null});
+                this.setState({ weatherData: json, error: null});
               });
             } else {
               response.json().then(json => {
-                this.setState({ data: null, error: json});
+                this.setState({ weatherData: null, error: json});
               });
             }
           });
@@ -83,13 +93,17 @@ class Weather extends Component {
           <form className="login-form">
           <button className="country-type" value="zip" onClick={this.updateReqType}>Zip</button>
           <button className="country-type" value="city-name" onClick={this.updateReqType}>City-name</button>
-            <input id="data" placeholder="zip"/>
-            <CountryList />
+            <input
+              id="data"
+              value = {this.state.reqData}
+              onChange={this.updateData}
+              placeholder={this.state.reqType}/>
+            <CountryList onCountryChange={this.updateCountry} />
             {this.state.error && <WeatherError error={this.state.error}/>}
             <button className="btn" onClick={this.getWeather}>get weather</button>
           </form>
         </div>
-        <DataContainer data={this.state.data}/>
+        <DataContainer data={this.state.weatherData}/>
       </div>
     );
   }
