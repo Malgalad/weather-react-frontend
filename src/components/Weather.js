@@ -3,7 +3,6 @@ import DataContainer from './DataContainer'
 import WeatherError from './WeatherError'
 import CountryList from './CountryList'
 import '../style.css'
-import $ from 'jquery'
 
 class Weather extends Component {
 
@@ -31,15 +30,15 @@ class Weather extends Component {
 
   updateReqType(e) {
     e.preventDefault();
-    this.setState( { reqType: e.target.value, reqData: '' } );
+    this.setState({ reqType: e.target.value, reqData: '' });
   }
 
   updateData(e) {
-    this.setState( { reqData: e.target.value } )
+    this.setState({ reqData: e.target.value });
   }
 
   updateCountry(countryAlpha2Code) {
-    this.setState( {curCountryCode: countryAlpha2Code} )
+    this.setState({ curCountryCode: countryAlpha2Code });
   }
 
   getWeather(e) {
@@ -47,7 +46,7 @@ class Weather extends Component {
     let rbody;
 
     if (this.state.reqType === "zip") {
-      if (!$.isNumeric(this.state.reqData)) {
+      if (!Number.isInteger(this.state.reqData)) {
         this.setState({ error: { message : "zip code should be numeric"} });
         return;
       }
@@ -73,11 +72,11 @@ class Weather extends Component {
           }).then(response => { //refactor-le
             if (response.ok) {
               response.json().then(json => {
-                this.setState({ weatherData: json, error: null});
+                this.setState({ weatherData: json, error: null });
               });
             } else {
               response.json().then(json => {
-                this.setState({ weatherData: null, error: json});
+                this.setState({ weatherData: null, error: json });
               });
             }
           });
@@ -95,10 +94,10 @@ class Weather extends Component {
           <button className="country-type" value="city-name" onClick={this.updateReqType}>City-name</button>
             <input
               id="data"
-              value = {this.state.reqData}
+              value ={this.state.reqData}
               onChange={this.updateData}
               placeholder={this.state.reqType}/>
-            <CountryList onCountryChange={this.updateCountry} />
+            <CountryList onCountryChange={this.updateCountry}/>
             {this.state.error && <WeatherError error={this.state.error}/>}
             <button className="btn" onClick={this.getWeather}>get weather</button>
           </form>
