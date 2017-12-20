@@ -46,7 +46,7 @@ class Weather extends Component {
     let rbody;
 
     if (this.state.reqType === "zip") {
-      if (!Number.isInteger(this.state.reqData)) {
+      if (isNaN(this.state.reqData)) {
         this.setState({ error: { message : "zip code should be numeric"} });
         return;
       }
