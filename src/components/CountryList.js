@@ -1,49 +1,37 @@
 import React, { Component } from 'react';
-import '../style.css'
+import '../style.css';
+import { reqUrl } from '../constants';
+import { getJSON } from '../api';
 
 function OptionCountryItem(props) {
-    return <option key={props.country.alpha2Code} value={props.country.alpha2Code}>{props.country.name}</option>
+  return <option value={props.country.alpha2Code}>{props.country.name}</option>
 }
 
 class CountryList extends Component {
 
   constructor(props) {
     super(props);
-    this.reqUrl = 'https://restcountries.eu/rest/v2/all?fields=name;alpha2Code';
-    this.state = { optCountrySet : null}
+    this.state = { optCountrySet: [], selected: '' };
 
-    this.componentDidMount = this.componentDidMount.bind(this);
     this.handleSelectChange = this.handleSelectChange.bind(this);
   }
 
   handleSelectChange(e) {
-    this.props.onCountryChange(e.target.value)
+    this.setState({ selected: e.target.value });
+    this.props.onCountryChange(e.target.value);
   }
 
   componentDidMount() {
-    fetch(this.reqUrl, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-    }).then(response => {
-      if (response.ok) {
-        response.json().then(json => {
-          this.setState({
-            optCountrySet: json.map((country) => (
-              <OptionCountryItem
-               country={country}/>)
-             )
-          });
-        });
-      }
-    });
+    getJSON(reqUrl)
+      .then(optCountrySet => this.setState({ optCountrySet }));
   }
 
   render() {
     return (
-      <select onChange={this.handleSelectChange} id="countries">
-        {this.state.optCountrySet}
+      <select onChange={this.handleSelectChange} value={this.state.selected}>
+        {this.state.optCountrySet.map(country =>
+          <OptionCountryItem key={country.alpha2Code} country={country}/>
+        )}
       </select>
     );
   }
